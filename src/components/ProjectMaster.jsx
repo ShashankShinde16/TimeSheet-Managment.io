@@ -1,9 +1,39 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import NavBar from './NavBar'
 import { Link } from 'react-router-dom';
 import Footer from './Footer';
+import axios from 'axios';
 
 const ProjectMaster = () => {
+    const[projects, setProjects] = useState([]);
+    useEffect(() => {
+        const source = axios.CancelToken.source(); // Create a cancel token to prevent memory leaks
+      
+        const fetchData = async () => {
+          try {
+            const response = await axios.get('https://localhost:7208/api/ProjectAPI', {
+              cancelToken: source.token, // Pass the cancel token with the request
+            });
+            console.log(response.data);
+            setProjects(response.data.result);
+          } catch (error) {
+            if (axios.isCancel(error)) {
+              console.log("Request canceled:", error.message);
+            } else {
+              console.error('Error fetching data:', error);
+            }
+          }
+        };
+      
+        fetchData();
+      
+        // Cleanup function to cancel the request if the component unmounts
+        return () => {
+          source.cancel('Operation canceled by the user.');
+        };
+      }, []); // Empty dependency array means this effect runs only once
+
+
     return (
         <>
             <NavBar />
@@ -34,26 +64,28 @@ const ProjectMaster = () => {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    {projects.map((project) => {
+                        return(
+                            <tbody key={project.projectID}>
                         <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                             <Link to={`/admin/project-detail/{id:5}`}>
-                                vc-109
+                                {project.projectID}
                             </Link>
                             </th>
                             <td className="px-6 py-4">
                             <Link to={`/admin/project-detail/{id:5}`}>
-                                TimeSheet-managment
+                                {project.description}
                             </Link>
                             </td>
                             <td className="px-6 py-4">
                             <Link to={`/admin/project-detail/{id:5}`}>
-                                web application
+                                {project.name}
                             </Link>
                             </td>
                             <td className="px-6 py-4">
                             <Link to={`/admin/project-detail/{id:5}`}>
-                                pending
+                                {project.status}
                             </Link>
                             </td>
                             <td className="px-6 py-4">
@@ -72,6 +104,7 @@ const ProjectMaster = () => {
                             </td>
                         </tr>
                     </tbody>
+                        )})}
                 </table>
             </div>
             <Footer />

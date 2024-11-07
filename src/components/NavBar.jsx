@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const NavBar = () => {
   // State to control dropdown visibility for main menu and the "Developer with no project" dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [users, setUsers] = useState([]);
 
   // Toggle the main menu (mobile)
   const toggleMenu = () => {
@@ -15,6 +17,34 @@ const NavBar = () => {
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
+
+  useEffect(() => {
+    const source = axios.CancelToken.source(); // Create a cancel token to prevent memory leaks
+  
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://localhost:7208/api/UserAPI', {
+          cancelToken: source.token, // Pass the cancel token with the request
+        });
+        console.log(response.data);
+        setUsers(response.data.result);
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log("Request canceled:", error.message);
+        } else {
+          console.error('Error fetching data:', error);
+        }
+      }
+    };
+  
+    fetchData();
+  
+    // Cleanup function to cancel the request if the component unmounts
+    return () => {
+      source.cancel('Operation canceled by the user.');
+    };
+  }, []); // Empty dependency array means this effect runs only once
+  
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
@@ -100,30 +130,18 @@ const NavBar = () => {
                   style={{ top: "100%", left: "0" }}
                 >
                   <ul className="py-2 text-sm text-gray-700 dark:text-gray-400">
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      >
-                        User 1
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      >
-                        User 2
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      >
-                        User 3
-                      </a>
-                    </li>
+                    {users.map((user) => {
+                        return (
+                            <li key={user.userID}>
+                            <a
+                                href="#"
+                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                            >
+                                {user.name}
+                            </a>
+                        </li>
+                        )
+                    })}                    
                   </ul>
                 </div>
               )}
