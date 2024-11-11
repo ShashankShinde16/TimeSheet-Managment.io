@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
 import axios from "axios";
 
-const AddProject = () => {
+const UpdateProject = (props) => {
+    const location = useLocation();
+    const { projectID, name, description } = location.state;
     const [project, setProject] = useState({
-        name: "",
-        description: ""
+        projectID: projectID,
+        name: name,
+        description: description
     });
     const navigate = useNavigate();
 
@@ -23,26 +26,20 @@ const AddProject = () => {
         event.preventDefault();
         
         try {
-            const response = await axios.post(
-              "https://localhost:7208/api/ProjectAPI",
+            const response = await axios.put(
+              `https://localhost:7208/api/ProjectAPI/id?id=${projectID}`,
                 project,{
                     headers: {
                       'Content-Type': 'application/json',
                       'Accept': '*/*'
                     }
                   }
-                );    
-                console.log(response.data.result);
-                  if (response.data && response.data.result) {
+                );
+                  if (response.status == 200) {
                     navigate("/admin/projects-list");
-                    } else {
-                        setError("Invalid details. Please try again.");
-            }
+                    } 
         } catch (error) {
             console.error('Error fetching data:', error);
-            setError("An error occurred while logging in. Please try again.");
-        } finally {
-            setLoading(false);  // Reset loading state
         }
     }
 
@@ -77,4 +74,4 @@ const AddProject = () => {
 }
 
 
-export default AddProject;
+export default UpdateProject;

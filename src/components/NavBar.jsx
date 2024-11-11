@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { logout } from "../features/userSlice";
 
 const NavBar = () => {
   // State to control dropdown visibility for main menu and the "Developer with no project" dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Toggle the main menu (mobile)
   const toggleMenu = () => {
@@ -18,12 +22,18 @@ const NavBar = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
+  const handleSignOut = async (event) => {
+    event.preventDefault();
+    dispatch(logout());
+    navigate("/");
+  }
+
   useEffect(() => {
     const source = axios.CancelToken.source(); // Create a cancel token to prevent memory leaks
   
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://localhost:7208/api/UserAPI', {
+        const response = await axios.get('https://localhost:7208/api/UserAPI/GetUserNoProjectAssigned', {
           cancelToken: source.token, // Pass the cancel token with the request
         });
         console.log(response.data);
@@ -88,6 +98,15 @@ const NavBar = () => {
           id="navbar-dropdown"
         >
           <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <li className="flex items-center">
+              <Link
+                to={`/admin/add-user`}
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
+                aria-current="page"
+              >
+                Add User
+              </Link>
+            </li>
             <li className="flex items-center">
               <Link
                 to={`/admin/add-project`}
@@ -150,7 +169,7 @@ const NavBar = () => {
             {/* Signout button */}
             <li className="flex items-center">
               <Link
-                to="/"
+                onClick={handleSignOut}
                 className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
                 aria-current="page"
               >
