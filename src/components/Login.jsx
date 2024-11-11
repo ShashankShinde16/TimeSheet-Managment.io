@@ -2,76 +2,83 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"; // Make sure axios is installed
-import { login, selectRole, SET_Role } from "../features/userSlice";
+import { login, selectRole, SET_JwtToken, SET_Role } from "../features/userSlice";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Login = () => {
-    const [credentials, setCredentials] = useState({ email: "", password: "" });
-    const [error, setError] = useState("");  // To handle errors
-    const [loading, setLoading] = useState(false);  // To manage loading state
-    const dispatch = useDispatch();
-    const navigate = useNavigate(); 
-    const userRole = useSelector(selectRole);
-  
-    // Handle the input change
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setCredentials((prevState) => ({
-        ...prevState,
-        [name]: value
-      }));
-    };
-    
-    // Handle form submission
-    const handleOnClick = async (event) => {
-      event.preventDefault();
-      
-      // Set loading state to true when making request
-      setLoading(true);
-      setError(""); 
-      
-      try {
-        const response = await axios.post(
-          "https://localhost:7208/api/UserAuth/Login",
-            credentials,{
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': '*/*'
-                }
-              }
-            );
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");  // To handle errors
+  const [loading, setLoading] = useState(false);  // To manage loading state
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const userRole = useSelector(selectRole);
 
-            const role = await axios.get(
-                `https://localhost:7208/api/UserAPI/id?id=${response.data.result.user.userID}`
-                  );
+  // Handle the input change
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
-              if (response.data && response.data.result) {
-                  // Dispatch login action with fetched data
-                  dispatch(login({
-                      name: response.data.result.user.name,
-                      id: response.data.result.user.userID,
-                      isLoggedIn: true
-                    }));
-                    dispatch(SET_Role(role.data.result.roleMaster.role))
-                    console.log(response.data.result.user);
-                    if(role.data.result.roleMaster.role == "Admin"){
-                        navigate("/admin/projects-list");
-                    }else if(role.data.result.roleMaster.role == "User"){
-                        navigate("/user/task-list");
-                    }
-                } else {
-                    setError("Invalid credentials. Please try again.");
+  // Handle form submission
+  const handleOnClick = async (event) => {
+    event.preventDefault();
+
+    // Set loading state to true when making request
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "https://localhost:7208/api/UserAuth/Login",
+        credentials, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*'
         }
+      }
+      );
+
+      const role = await axios.get(
+        `https://localhost:7208/api/UserAPI/id?id=${response.data.result.user.userID}`
+      );
+
+      if (response.data && response.data.result) {
+        // Dispatch login action with fetched data
+        dispatch(login({
+          name: response.data.result.user.name,
+          id: response.data.result.user.userID,
+          isLoggedIn: true
+        }));
+        dispatch(SET_Role(role.data.result.roleMaster.role));
+        dispatch(SET_JwtToken(response.data.result.token));
+        console.log(response.data.result.user);
+        if (role.data.result.roleMaster.role == "Admin") {
+          navigate("/admin/projects-list");
+        } else if (role.data.result.roleMaster.role == "User") {
+          navigate("/user/task-list");
+        }
+      } else {
+        setError("Invalid credentials. Please try again.");
+      }
     } catch (error) {
-        console.error('Error fetching data:', error);
-        setError("An error occurred while logging in. Please try again.");
-    } finally {
-        setLoading(false);  // Reset loading state
+      toast.error(`Error : ${error.response.data.errorMesseges}`, {
+            autoClose: 5000,
+            hideProgressBar: false,
+          });
+
     }
-};
+  };
 
 
   return (
     <div>
+      {/* Toast Container */}
+      <ToastContainer />
       <form
         className="bg-gray-50 dark:bg-gray-900"
         onSubmit={(event) => handleOnClick(event)}
@@ -120,30 +127,13 @@ const Login = () => {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-start">
-                    <div className="flex items-center h-5">
-                      <input
-                        id="remember"
-                        aria-describedby="remember"
-                        type="checkbox"
-                        className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                      />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label
-                        htmlFor="remember"
-                        className="text-gray-500 dark:text-gray-300"
-                      >
-                        Remember me
-                      </label>
-                    </div>
-                  </div>
-                  <a
-                    href="#"
+                  
+                  <Link
+                    to={"/reset-password"}
                     className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
                   >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
                 <button
                   type="submit"
@@ -162,12 +152,12 @@ const Login = () => {
 
 export default Login;
 
-                // <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                //   Don’t have an account yet?{" "}
-                //   <Link
-                //     to="/signup"
-                //     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                //   >
-                //     Sign up
-                //   </Link>
-                // </p>
+// <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+//   Don’t have an account yet?{" "}
+//   <Link
+//     to="/signup"
+//     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+//   >
+//     Sign up
+//   </Link>
+// </p>

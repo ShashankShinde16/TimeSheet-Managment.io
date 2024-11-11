@@ -4,14 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { selectId, selectIsLoggedIn, selectName } from '../features/userSlice';
+import { selectToken } from '../features/userSlice';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProjectMaster = () => {
     const [projects, setProjects] = useState([]);
     const navigate = useNavigate();
-    const userName = useSelector(selectName);
-    const userID = useSelector(selectId);
-    const userIsLoggedIn = useSelector(selectIsLoggedIn);
+    const token = useSelector(selectToken);
     const [refresh, setRefresh] = useState(false); // A state to trigger re-fetch
 
     useEffect(() => {
@@ -53,18 +53,24 @@ const ProjectMaster = () => {
             setRefresh((prev) => !prev); // Toggle the refresh state
 
         } catch (error) {
-            if (axios.isCancel(error)) {
-                console.log("Request canceled:", error.message);
-            } else {
-                console.error('Error deleting data:', error);
-            }
+            toast.error(`Error : ${error.response.data.errorMesseges}`, {
+                autoClose: 5000,
+                hideProgressBar: false,
+              });
         }
     };
 
+    useEffect(() => {
+        if (!token) {
+          navigate("/");
+        }
+      }, []);
 
     return (
         <>
             <NavBar />
+            {/* Toast Container */}
+      <ToastContainer />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -78,9 +84,9 @@ const ProjectMaster = () => {
                             <th scope="col" className="px-6 py-3">
                                 Description
                             </th>
-                            <th scope="col" className="px-6 py-3">
+                            {/* <th scope="col" className="px-6 py-3">
                                 Status
-                            </th>
+                            </th> */}
                             <th scope="col" className="px-6 py-3">
                                 Create Date
                             </th>
@@ -97,7 +103,7 @@ const ProjectMaster = () => {
                             <tbody key={project.projectID}>
                                 <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                        <Link to={`/admin/project-detail/{id:5}`}>
+                                        <Link to={`/admin/project-detail/${project.projectID}`}>
                                             {project.projectID}
                                         </Link>
                                     </th>
@@ -111,11 +117,11 @@ const ProjectMaster = () => {
                                             {project.description}
                                         </Link>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    {/* <td className="px-6 py-4">
                                         <Link to={`/admin/project-detail/${project.projectID}`}>
                                             {project.status}
                                         </Link>
-                                    </td>
+                                    </td> */}
                                     <td className="px-6 py-4">
                                         <Link to={`/admin/project-detail/${project.projectID}`}>
                                             12/09/2024

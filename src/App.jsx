@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -7,10 +7,12 @@ import AddUser from './components/AddUser'
 import ProjectMaster from './components/ProjectMaster'
 import AddProject from './components/AddProject'
 import UserMaster from './components/UserMaster'
-import { Route, Routes, BrowserRouter } from 'react-router-dom'
+import { Route, Routes, BrowserRouter, useNavigate } from 'react-router-dom'
 import TaskMaster from './components/TaskMaster'
 import ProjectDetails from './components/ProjectDetails'
 import UpdateProject from './components/UpdateProject'
+import ResetPassword from './components/ResetPassword'
+
 
 function App() {
 
@@ -22,6 +24,7 @@ function App() {
     >
       <Routes>
         <Route path='/' element={<Login />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='admin'>
           <Route path='projects-list' element={<ProjectMaster />} />
           <Route path='add-user' element={<AddUser />} />

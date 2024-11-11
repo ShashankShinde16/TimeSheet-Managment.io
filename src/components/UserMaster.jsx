@@ -1,35 +1,37 @@
 import { React, useEffect, useState } from 'react'
 import NavBar from './NavBar'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { selectId, selectIsLoggedIn, selectName } from '../features/userSlice';
+import { selectId, selectToken} from '../features/userSlice';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const UserMaster = () => {
-    const userName = useSelector(selectName);
-    const userIsLoggedIn = useSelector(selectIsLoggedIn);
-    const [userProjects, setUserProjects] = useState([]);
-    const userID = useSelector(selectId);
-    useEffect(() => {
-        const source = axios.CancelToken.source(); // Create a cancel token to prevent memory leaks
+  const navigate = useNavigate();
+  const token = useSelector(selectToken);
 
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`https://localhost:7208/api/TaskAPI/id?id=${userID}`, {
-                    cancelToken: source.token, // Pass the cancel token with the request
+  const [userProjects, setUserProjects] = useState([]);
+  const userID = useSelector(selectId);
+  useEffect(() => {
+      const source = axios.CancelToken.source(); // Create a cancel token to prevent memory leaks
+      
+      const fetchData = async () => {
+          try {
+              const response = await axios.get(`https://localhost:7208/api/TaskAPI/id?id=${userID}`, {
+                  cancelToken: source.token, // Pass the cancel token with the request
                 });
                 console.log(response.data);
                 setUserProjects(response.data.result);
             } catch (error) {
-                if (axios.isCancel(error)) {
-                    console.log("Request canceled:", error.message);
-                } else {
-                    console.error('Error fetching data:', error);
-                }
+                toast.error(`Error : ${error.response.data.errorMesseges}`, {
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                  });
             }
         };
-
+        
         fetchData();
 
         // Cleanup function to cancel the request if the component unmounts
@@ -37,11 +39,18 @@ const UserMaster = () => {
             source.cancel('Operation canceled by the user.');
         };
     }, []);
-
-
+    
+    useEffect(() => {
+      if (!token) {
+        navigate("/");
+      }
+    }, []);
+    
     return (
         <>
             <NavBar />
+            {/* Toast Container */}
+            <ToastContainer />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

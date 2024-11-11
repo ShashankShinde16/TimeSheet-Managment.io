@@ -1,25 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
 import Task from "./subComponents/Task";
+import { useSelector } from 'react-redux'
+import { selectToken } from '../features/userSlice'
 import ProjectInfo from "./subComponents/projectInfo";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import UserDetails from "./subComponents/UserDetails";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProjectDetails = (params) => {
-    const {id:projectID} = useParams(params.id);
-    // State to track the active tab
-    const [activeTab, setActiveTab] = useState("project");
+  const navigate = useNavigate();
+  const token = useSelector(selectToken);
 
-    // Function to handle tab switching
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
+  const {id:projectID} = useParams(params.id);
+  // State to track the active tab
+  const [activeTab, setActiveTab] = useState("project");
+  
+  // Function to handle tab switching
+  const handleTabClick = (tab) => {
+      setActiveTab(tab);
     };
+
+
+    useEffect(() => {
+      if (!token) {
+        navigate("/");
+      }
+    }, []);
 
     return (
         <>
             <NavBar />
-
+{/* Toast Container */}
+<ToastContainer />
             <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <ul className="flex justify-around text-sm font-medium text-center text-gray-500 border-b border-gray-200 rounded-t-lg bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800" role="tablist">
                     <li className="me-2">

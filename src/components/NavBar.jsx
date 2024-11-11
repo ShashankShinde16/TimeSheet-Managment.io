@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import { logout } from "../features/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, selectRole, SET_JwtToken } from "../features/userSlice";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const NavBar = () => {
   // State to control dropdown visibility for main menu and the "Developer with no project" dropdown
@@ -11,6 +13,7 @@ const NavBar = () => {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const role = useSelector(selectRole);
 
   // Toggle the main menu (mobile)
   const toggleMenu = () => {
@@ -24,13 +27,14 @@ const NavBar = () => {
 
   const handleSignOut = async (event) => {
     event.preventDefault();
+    dispatch(SET_JwtToken(null));
     dispatch(logout());
-    navigate("/");
+    navigate("/", { replace: true });
   }
 
   useEffect(() => {
     const source = axios.CancelToken.source(); // Create a cancel token to prevent memory leaks
-  
+
     const fetchData = async () => {
       try {
         const response = await axios.get('https://localhost:7208/api/UserAPI/GetUserNoProjectAssigned', {
@@ -39,25 +43,24 @@ const NavBar = () => {
         console.log(response.data);
         setUsers(response.data.result);
       } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled:", error.message);
-        } else {
-          console.error('Error fetching data:', error);
+        console.log(error.massege);
         }
-      }
     };
-  
+
     fetchData();
-  
+
     // Cleanup function to cancel the request if the component unmounts
     return () => {
       source.cancel('Operation canceled by the user.');
     };
-  }, []); // Empty dependency array means this effect runs only once
-  
+  }, []);
+
+
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      {/* Toast Container */}
+      <ToastContainer />
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         {/* Brand */}
         <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -98,73 +101,79 @@ const NavBar = () => {
           id="navbar-dropdown"
         >
           <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-          <li className="flex items-center">
-              <Link
-                to={`/admin/add-user`}
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
-                aria-current="page"
-              >
-                Add User
-              </Link>
-            </li>
-            <li className="flex items-center">
-              <Link
-                to={`/admin/add-project`}
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
-                aria-current="page"
-              >
-                Add Project
-              </Link>
-            </li>
+            {(role == "Admin") &&
+              <li className="flex items-center">
+                <Link
+                  to={`/admin/add-user`}
+                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
+                  aria-current="page"
+                >
+                  Add User
+                </Link>
+              </li>
+            }
+            {(role == "Admin") &&
+              <li className="flex items-center">
+                <Link
+                  to={`/admin/add-project`}
+                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
+                  aria-current="page"
+                >
+                  Add Project
+                </Link>
+              </li>
+            }
 
             {/* Developer with no project dropdown */}
-            <li className="relative">
-              <button
-                onClick={toggleDropdown}  // Toggle dropdown visibility
-                className="flex items-center justify-between w-full h-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
-              >
-                Developer with no project
-                <svg
-                  className="w-2.5 h-2.5 ms-2.5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 10 6"
+            {(role == "Admin") &&
+              <li className="relative">
+                <button
+                  onClick={toggleDropdown}  // Toggle dropdown visibility
+                  className="flex items-center justify-between w-full h-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
                 >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 1 4 4 4-4"
-                  />
-                </svg>
-              </button>
+                  Developer with no project
+                  <svg
+                    className="w-2.5 h-2.5 ms-2.5"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 4 4 4-4"
+                    />
+                  </svg>
+                </button>
 
-              {/* Dropdown menu */}
-              {dropdownOpen && (
-                <div
-                  id="dropdownNavbar"
-                  className="absolute z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
-                  style={{ top: "100%", left: "0" }}
-                >
-                  <ul className="py-2 text-sm text-gray-700 dark:text-gray-400">
-                    {users.map((user) => {
+                {/* Dropdown menu */}
+                {dropdownOpen && (
+                  <div
+                    id="dropdownNavbar"
+                    className="absolute z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+                    style={{ top: "100%", left: "0" }}
+                  >
+                    <ul className="py-2 text-sm text-gray-700 dark:text-gray-400">
+                      {users.map((user) => {
                         return (
-                            <li key={user.userID}>
+                          <li key={user.userID}>
                             <a
-                                href="#"
-                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                              href="#"
+                              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                             >
-                                {user.name}
+                              {user.name}
                             </a>
-                        </li>
+                          </li>
                         )
-                    })}                    
-                  </ul>
-                </div>
-              )}
-            </li>
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </li>
+            }
 
             {/* Signout button */}
             <li className="flex items-center">

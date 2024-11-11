@@ -1,19 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import { useSelector } from "react-redux";
-import { selectRole } from "../features/userSlice";
+import { useSelector } from 'react-redux'
+import { selectRole, selectToken } from "../features/userSlice";
 import axios from "axios";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TaskMaster = (params) => {
-    const {id:userId} = useParams(params.id);
-    const userRole = useSelector(selectRole);
-    const [task, setTask] = useState({
-        userID : userId,
-        projectID : "",
-        taskDetails : "",
-        duration : ""
+  const token = useSelector(selectToken);
+  const {id:userId} = useParams(params.id);
+  const userRole = useSelector(selectRole);
+  const [task, setTask] = useState({
+      userID : userId,
+      projectID : "",
+      taskDetails : "",
+      duration : ""
     });
     const navigate = useNavigate();
 
@@ -23,42 +26,50 @@ const TaskMaster = (params) => {
           ...prevState,
           [name]: value
         }));
-      };
-
+    };
+    
     const handleOnClick = async (event) => {
         event.preventDefault();
         
         try {
             const response = await axios.post(
-              "https://localhost:7208/api/TaskAPI",
+                "https://localhost:7208/api/TaskAPI",
                 task,{
                     headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': '*/*'
+                        'Content-Type': 'application/json',
+                        'Accept': '*/*'
                     }
-                  }
-                );    
-                console.log(response.data.result);
-                  if (response.data && response.data.result) {
-                        if(userRole == "Admin"){
-                            navigate("/admin/projects-list");
-                        }else if(userRole == "User"){
+                }
+            );    
+            console.log(response.data.result);
+            if (response.data && response.data.result) {
+                if(userRole == "Admin"){
+                    navigate("/admin/projects-list");
+                }else if(userRole == "User"){
                             navigate("/user/task-list");
                         }
                     } else {
                         setError("Invalid details. Please try again.");
+                    }
+                } catch (error) {
+                    toast.error(`Error : ${error.response.data.errorMesseges}`, {
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                      });
+                }
             }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setError("An error occurred while logging in. Please try again.");
-        } finally {
-            setLoading(false);  // Reset loading state
-        }
-    }
-
-    return (
-        <>
+            
+              useEffect(() => {
+                if (!token) {
+                  navigate("/");
+                }
+              }, []);
+            
+            return (
+                <>
             <NavBar />
+            {/* Toast Container */}
+      <ToastContainer />
             <div className="flex items-center justify-center w-full mt-10">
                 <form className="w-full mx-6" onSubmit={(event) => handleOnClick(event)}>
                     <div className="mb-5">
