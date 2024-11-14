@@ -9,7 +9,6 @@ const UserDetails = (props) => {
     const [search, setSearch] = useState('');
     const [noProjects, setNoProjects] = useState([]);
     const [filter, setFilter] = useState([]);
-    const navigate = useNavigate();
     const searchInputRef = useRef(null);
 
     // Handle search input change
@@ -38,16 +37,14 @@ const UserDetails = (props) => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`https://localhost:7208/api/ProjectAssignedUserAPI/PAUById?id=${props.projectID}`, {
-                    cancelToken: source.token, // Pass the cancel token with the request
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/PAUByProjectId?id=${props.projectID}`, {
+                    cancelToken: source.token, 
                 });
-                const usersWithNoProjects = await axios.get('https://localhost:7208/api/UserAPI/GetUserNoProjectAssigned', {
-                    cancelToken: source.token, // Pass the cancel token with the request
+                const usersWithNoProjects = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/UserAPI/GetUserNoProjectAssigned`, {
+                    cancelToken: source.token, 
                 });
-                console.log(response.data);  // Log project user details
-                console.log(usersWithNoProjects.data);  // Log users with no projects
-                setUsers(response.data.result);  // Set users assigned to the project
-                setNoProjects(usersWithNoProjects.data.result);  // Set users without projects
+                setUsers(response.data.result);  
+                setNoProjects(usersWithNoProjects.data.result);  
             } catch (error) {
                 console.log(error.message);
             }
@@ -66,7 +63,7 @@ const UserDetails = (props) => {
 
         try {
             // Send POST request to add user to the project
-            const response = await axios.post(`https://localhost:7208/api/ProjectAssignedUserAPI/CreateProjectAssignedUser`,
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/CreateProjectAssignedUser`,
                 {
                     "projectID": props.projectID,
                     "userID": data.userID
@@ -94,8 +91,7 @@ const UserDetails = (props) => {
         e.preventDefault();
 
         try {
-            const response = await axios.delete(`https://localhost:7208/api/ProjectAssignedUserAPI/id?id=${data.id}`);
-            console.log(response);
+            const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/id?id=${data.id}`);
             setUsers((prevUsers) => prevUsers.filter((user) => user.id !== data.id)); // Remove from users
             setNoProjects((prevNoProjects) => [...prevNoProjects, data.user]); // Add back to noProjects
         } catch (error) {
@@ -110,15 +106,15 @@ const UserDetails = (props) => {
         e.preventDefault();
 
         try {
-            const response = await axios.get(`https://localhost:7208/api/TaskAPI/GetWorkingHoursByUser/${props.projectID}/${data.user.userID}`);
+            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/TaskAPI/GetWorkingHoursByUser/${props.projectID}/${data.user.userID}`);
 
                 toast.success(`Duration : ${response.data.result}`, {
-                    autoClose: 5000,
+                    autoClose: 2000,
                     hideProgressBar: false,
                 });
 
         } catch (error) {
-            toast.error(`Error : ${error.response.data.errorMesseges}`, {
+            toast.success(`Duration : ${error.response.data.errorMesseges}`, {
                 autoClose: 5000,
                 hideProgressBar: false,
               });
@@ -141,13 +137,11 @@ const UserDetails = (props) => {
     }, []);
 
     return (
-        <div className='w-full flex items-center justify-around'>
-            {/* Toast Container */}
+        <div className='w-full flex items-center justify-center'>
             <ToastContainer />
-
             <div>
                 <h2 className="mb-5 text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                    Users who are associated with this project
+                    Users associated with this project
                 </h2>
                 {/* List of users associated with the project */}
                 <ul role="list" className="space-y-4 text-gray-500 dark:text-gray-400">
@@ -164,34 +158,6 @@ const UserDetails = (props) => {
                         </li>
                     ))}
                 </ul>
-            </div>
-
-            <div>
-                <form className="flex items-center justify-center max-w-sm mx-auto">
-                    <label htmlFor="simple-search" className="sr-only">Search</label>
-                    <div className="relative w-full" ref={searchInputRef}>
-                        <input
-                            onChange={handleSearchChange}
-                            value={search}
-                            type="text"
-                            id="simple-search"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Search user name..."
-                            required
-                        />
-                        {filter.length > 0 && (
-                            <ul className="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                                {filter.map((data, index) => (
-                                    <Link key={index} onClick={(event) => handleAddUser(event, data)}>
-                                        <li className="px-4 py-2 text-gray-700 hover:bg-blue-100">
-                                            {data.name}
-                                        </li>
-                                    </Link>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                </form>
             </div>
         </div>
     );

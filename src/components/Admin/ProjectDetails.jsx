@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
-import NavBar from "./NavBar";
-import Footer from "./Footer";
-import Task from "./subComponents/Task";
+import NavBar from "../comman/NavBar";
+import Footer from "../comman/Footer";
+import Task from "../ProjectDetails/Task";
 import { useSelector } from 'react-redux'
-import { selectToken } from '../features/userSlice'
-import ProjectInfo from "./subComponents/projectInfo";
-import { useNavigate, useParams } from "react-router-dom";
-import UserDetails from "./subComponents/UserDetails";
+import { selectToken } from '../../features/userSlice'
+import ProjectInfo from "../ProjectDetails/projectInfo";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import UserDetails from "../ProjectDetails/UserDetails";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const ProjectDetails = (params) => {
   const navigate = useNavigate();
   const token = useSelector(selectToken);
-
+  const location = useLocation();
+  const tab  = location.state;
+ console.log(tab);
   const {id:projectID} = useParams(params.id);
   // State to track the active tab
-  const [activeTab, setActiveTab] = useState("project");
+  const [activeTab, setActiveTab] = useState(tab);
   
   // Function to handle tab switching
   const handleTabClick = (tab) => {
@@ -33,8 +35,7 @@ const ProjectDetails = (params) => {
     return (
         <>
             <NavBar />
-{/* Toast Container */}
-<ToastContainer />
+            <ToastContainer />
             <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
                 <ul className="flex justify-around text-sm font-medium text-center text-gray-500 border-b border-gray-200 rounded-t-lg bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800" role="tablist">
                     <li className="me-2">
@@ -95,7 +96,7 @@ const ProjectDetails = (params) => {
                     </div>
 
                     <div
-                        className={`p-4 bg-white rounded-lg md:p-8 dark:bg-gray-800 ${activeTab === "task" ? "" : "hidden"}`}
+                        className={`p-4 bg-white rounded-lg md:p-4 dark:bg-gray-800 ${activeTab === "task" ? "" : "hidden"}`}
                         id="task"
                         role="tabpanel"
                         aria-labelledby="task-tab"

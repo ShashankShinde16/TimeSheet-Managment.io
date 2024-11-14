@@ -6,7 +6,8 @@ const initialState = {
   id: localStorage.getItem('userId') || null,
   role: localStorage.getItem('role') || null,
   isLoggedIn: localStorage.getItem('isLoggedIn') === 'true' || false,
-  token: localStorage.getItem('authToken') || null
+  token: localStorage.getItem('authToken') || null,
+  showToast: false
 };
 
 const userSlice = createSlice({
@@ -20,6 +21,9 @@ const userSlice = createSlice({
     SET_JwtToken(state, action) {
       localStorage.setItem("authToken", action.payload);
       state.token = action.payload;
+    },
+    setShowToast(state, action) {
+      state.showToast = action.payload;
     },
     login(state, action) {
       state.name = action.payload.name;
@@ -44,12 +48,13 @@ const userSlice = createSlice({
 
 
 // Export actions to use in components
-export const { SET_Role, SET_JwtToken, login, logout } = userSlice.actions;
+export const { SET_Role, SET_JwtToken, setShowToast, login, logout } = userSlice.actions;
 
 export const selectName = (state) => state.user.name;
 export const selectId = (state) => state.user.id;
 export const selectRole = (state) => state.user.role;
 export const selectToken = (state) => state.user.token;
+export const selectShowToast = (state) => state.user.showToast;
 export const selectIsLoggedIn = (state) => state.user.isLoggedIn;
 
 // Export the reducer to be used in the store

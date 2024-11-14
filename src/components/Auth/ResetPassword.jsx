@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const ResetPassword = () => {
     const [credentials, setCredentials] = useState({ userID: "", name: "", email: "", password: "" });
-    const [confirm, setConfirm] = useState("");
     const navigate = useNavigate(); 
   
     // Handle the input change
@@ -31,11 +30,22 @@ const ResetPassword = () => {
               'Accept': '*/*'
             }
           });
-          if (response.status == 200) {
-            navigate("/");
+          if (response.data.statusCode == 204) {
+            toast.success(`you have successfully reset the password`, {
+              autoClose: 1000,
+              hideProgressBar: false,
+            });
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
+          }else{
+            toast.error(`Error : invalid id, user name and password are not matching with user data`, {
+              autoClose: 5000,
+              hideProgressBar: false,
+            });
           }
     } catch (error) {
-        toast.error(`Error : ${error.response.data.errorMesseges}`, {
+        toast.error(`Error : ${error.message}`, {
             autoClose: 5000,
             hideProgressBar: false,
           });

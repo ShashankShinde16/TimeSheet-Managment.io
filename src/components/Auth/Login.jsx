@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Make sure axios is installed
-import { login, selectRole, SET_JwtToken, SET_Role } from "../features/userSlice";
+import { login, SET_JwtToken, SET_Role, setShowToast } from "../../features/userSlice";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");  // To handle errors
-  const [loading, setLoading] = useState(false);  // To manage loading state
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userRole = useSelector(selectRole);
 
   // Handle the input change
   const handleInputChange = (e) => {
@@ -28,56 +24,48 @@ const Login = () => {
   const handleOnClick = async (event) => {
     event.preventDefault();
 
-    // Set loading state to true when making request
-    setLoading(true);
-    setError("");
-
     try {
       const response = await axios.post(
-        "https://localhost:7208/api/UserAuth/Login",
+        `${import.meta.env.VITE_BASE_URL}/api/UserAuth/Login`,
         credentials, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': '*/*'
         }
-      }
-      );
-
-      const role = await axios.get(
-        `https://localhost:7208/api/UserAPI/id?id=${response.data.result.user.userID}`
-      );
-
-      if (response.data && response.data.result) {
+      });
+      console.log(response.data);
+      if (response.data.statusCode == 200) {
         // Dispatch login action with fetched data
         dispatch(login({
           name: response.data.result.user.name,
           id: response.data.result.user.userID,
           isLoggedIn: true
         }));
-        dispatch(SET_Role(role.data.result.roleMaster.role));
-        dispatch(SET_JwtToken(response.data.result.token));
-        console.log(response.data.result.user);
-        if (role.data.result.roleMaster.role == "Admin") {
-          navigate("/admin/projects-list");
-        } else if (role.data.result.roleMaster.role == "User") {
-          navigate("/user/task-list");
+        if(response.data.result.user.roleID == 1){
+          dispatch(SET_Role("Admin"));
+        }else{
+          dispatch(SET_Role("User"));
         }
-      } else {
-        setError("Invalid credentials. Please try again.");
+
+        dispatch(SET_JwtToken(response.data.result.token));
+        dispatch(setShowToast(true));
+          // Navigate based on role
+        if (response.data.result.user.roleID === 1) {
+          navigate("/admin/projects-list");
+        } else if (response.data.result.user.roleID === 2) {
+          navigate("/user/projects-list");
+        }
       }
     } catch (error) {
-      toast.error(`Error : ${error.response.data.errorMesseges}`, {
-            autoClose: 5000,
-            hideProgressBar: false,
-          });
-
+      toast.error(`Login Failed: ${error.response.data.errorMesseges}`, {
+        autoClose: 3000,
+        hideProgressBar: false,
+      });
     }
   };
 
-
   return (
     <div>
-      {/* Toast Container */}
       <ToastContainer />
       <form
         className="bg-gray-50 dark:bg-gray-900"
@@ -126,15 +114,7 @@ const Login = () => {
                     required
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  
-                  <Link
-                    to={"/reset-password"}
-                    className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
+
                 <button
                   type="submit"
                   className="w-full text-white bg-sky-600 hover:bg-sky-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
@@ -151,13 +131,3 @@ const Login = () => {
 };
 
 export default Login;
-
-// <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-//   Don’t have an account yet?{" "}
-//   <Link
-//     to="/signup"
-//     className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-//   >
-//     Sign up
-//   </Link>
-// </p>

@@ -1,6 +1,6 @@
 const Footer = () => {
     return (
-        <div className="fixed bottom-0 w-screen flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <div className="flex-grow">
                 {/* Main content goes here */}
             </div>
@@ -14,6 +14,6 @@ const Footer = () => {
             </footer>
         </div>
     );
-}
+};
 
 export default Footer;

@@ -9,10 +9,9 @@ const ProjectInfo = (props) => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`https://localhost:7208/api/ProjectAPI/id?id=${props.projectID}`, {
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/ProjectAPI/id?id=${props.projectID}`, {
                     cancelToken: source.token, // Pass the cancel token with the request
                 });
-                console.log(response.data);
                 setProject(response.data.result);
             } catch (error) {
                 if (axios.isCancel(error)) {
