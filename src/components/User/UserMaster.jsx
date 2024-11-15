@@ -1,13 +1,13 @@
 import { React, useEffect, useState } from 'react'
-import NavBar from '../comman/NavBar'
+import NavBar from '../common/NavBar'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Footer from '../comman/Footer';
+import Footer from '../common/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { selectId, selectShowToast, selectToken, setShowToast} from '../../features/userSlice';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import User from '../User';
+import User from '../Admin/User';
 
 const UserMaster = () => {
     const [projects, setProjects] = useState([]);

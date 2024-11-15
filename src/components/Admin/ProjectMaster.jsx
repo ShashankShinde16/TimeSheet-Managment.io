@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import NavBar from '../comman/NavBar';
+import NavBar from '../common/NavBar';
 import { Link, useNavigate } from 'react-router-dom';
-import Footer from '../comman/Footer';
+import Footer from '../common/Footer';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectShowToast, selectToken, setShowToast } from '../../features/userSlice';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+const formatDate = (datetime) => {
+    const date = new Date(datetime);
+    return date.toLocaleDateString('en-GB').split('T')[0];
+  };
 
 const ProjectMaster = () => {
     const [projects, setProjects] = useState([]);
@@ -158,8 +163,7 @@ const ProjectMaster = () => {
                             <th scope="col" className="px-6 py-3">Description</th>
                             <th scope="col" className="px-6 py-3">Status</th>
                             <th scope="col" className="px-6 py-3">Users</th>
-                            <th scope="col" className="px-6 py-3">Create Date</th>
-                            <th scope="col" className="px-6 py-3">Update Date</th>
+                            <th scope="col" className="px-6 py-3">Create Date / Update Date</th>
                             <th scope="col" className="px-6 py-3">Action</th>
                         </tr>
                     </thead>
@@ -187,19 +191,14 @@ const ProjectMaster = () => {
                                             {project.status}
                                         </Link>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-6 py-4 text-center">
                                         <Link to={`/admin/project-detail/${project.projectID}`} state={"User"}>
                                             {project.users}
                                         </Link>
                                     </td>
                                     <td className="px-6 py-4">
                                         <Link to={`/admin/project-detail/${project.projectID}`} state={"project"}>
-                                            {project.createDate}
-                                        </Link>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <Link to={`/admin/project-detail/${project.projectID}`} state={"project"}>
-                                            {project.updateDate}
+                                            {formatDate(project.createDate)+" / "+formatDate(project.updateDate)}
                                         </Link>
                                     </td>
                                     <td className="px-6 py-4">

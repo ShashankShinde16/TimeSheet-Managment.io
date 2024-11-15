@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import NavBar from "./comman/NavBar";
+import NavBar from "../common/NavBar";
 import { useSelector } from 'react-redux'
-import { selectToken } from '../features/userSlice'
-import Footer from "./comman/Footer";
+import { selectToken } from '../../features/userSlice'
+import Footer from "../common/Footer";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

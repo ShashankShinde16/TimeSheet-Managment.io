@@ -1,6 +1,6 @@
 import { React, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -108,7 +108,7 @@ const UserDetails = (props) => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/TaskAPI/GetWorkingHoursByUser/${props.projectID}/${data.user.userID}`);
 
-                toast.success(`Duration : ${response.data.result}`, {
+                toast.success(`Duration : ${response.data.result} hours`, {
                     autoClose: 2000,
                     hideProgressBar: false,
                 });

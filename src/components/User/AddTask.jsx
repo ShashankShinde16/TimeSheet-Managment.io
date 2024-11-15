@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
-import NavBar from "../comman/NavBar";
-import Footer from "../comman/Footer";
+import NavBar from "../common/NavBar";
+import Footer from "../common/Footer";
 import { useSelector } from 'react-redux'
 import { selectRole, selectToken } from "../../features/userSlice";
 import axios from "axios";

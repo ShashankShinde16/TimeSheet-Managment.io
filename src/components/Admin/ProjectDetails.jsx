@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import NavBar from "../comman/NavBar";
-import Footer from "../comman/Footer";
+import NavBar from "../common/NavBar";
+import Footer from "../common/Footer";
 import Task from "../ProjectDetails/Task";
 import { useSelector } from 'react-redux'
 import { selectToken } from '../../features/userSlice'

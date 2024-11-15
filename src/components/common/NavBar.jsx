@@ -10,7 +10,6 @@ const NavBar = () => {
   // State to control dropdown visibility for main menu and the "Developer with no project" dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const role = useSelector(selectRole);
@@ -40,29 +39,6 @@ const NavBar = () => {
     dispatch(logout());
     navigate("/", { replace: true });
   }
-
-  useEffect(() => {
-    const source = axios.CancelToken.source(); 
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/UserAPI/GetUserNoProjectAssigned`, {
-          cancelToken: source.token, 
-        });
-        setUsers(response.data.result);
-      } catch (error) {
-        console.log(error.massege);
-        }
-    };
-
-    fetchData();
-
-
-    return () => {
-      source.cancel('Operation canceled by the user.');
-    };
-  }, []);
-
 
 
   return (

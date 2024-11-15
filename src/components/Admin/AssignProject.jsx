@@ -1,40 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import NavBar from './comman/NavBar';
+import NavBar from '../common/NavBar';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Footer from './comman/Footer';
+import Footer from '../common/Footer';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import { selectToken } from '../features/userSlice';
+import { selectToken } from '../../features/userSlice';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const RemoveFromProject = () => {
+const AssignProject = () => {
     const [projects, setProjects] = useState([]);
     const location = useLocation();
-    const userID  = location.state;
+    const { userID, projectDTO}  = location.state;
     const navigate = useNavigate();
     const token = useSelector(selectToken);
     const [projectNameFilter,setProjectNameFilter] = useState('');
     const [projectIdFilter, setprojectIdFilter] = useState('');
 
-    const filteredProjects = projects.filter((data) => {
-        const matchesProjectID = data.projectID.toString().includes(projectIdFilter);
-        const matchesProjectName = data.project.projectName.toLowerCase().includes(projectNameFilter.toLowerCase());
-    
-        return matchesProjectID && matchesProjectName;
+    const filteredProjects = projects.filter((project) => {
+        const matchesProjectID = project.projectID.toString().includes(projectIdFilter);
+        const matchesProjectName = project.name.toLowerCase().includes(projectNameFilter.toLowerCase());
+        const isProjectInDTO = projectDTO.some(dto => dto.projectID === project.projectID);
+
+        return matchesProjectID && matchesProjectName && !isProjectInDTO;
     });
 
-    const handleOnRemove = async (event, id) => {
+    const handleOnAssign = async (event, projectID) => {
         event.preventDefault();
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/id?id=${id}`,
-                {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/CreateProjectAssignedUser`,
+                {projectID,userID}, {
                     headers: {
                       'Content-Type': 'application/json',
                       'Accept': '*/*'
                     }
                   });
-                  if(response.data.statusCode == 204){
+                  if(response.data.statusCode == 201){
                     navigate("/admin/user-list");
                   }
         } catch (error) {
@@ -52,7 +53,7 @@ const RemoveFromProject = () => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/PAUByUserId?id=${userID}`, {
+                const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/ProjectAPI`, {
                     cancelToken: source.token, // Pass the cancel token with the request
                 });
                 setProjects(response.data.result); // Update state with the fetched data
@@ -82,7 +83,6 @@ const RemoveFromProject = () => {
     return (
         <>
             <NavBar />
-            <ToastContainer />
             <label htmlFor="projectId-search" className="sr-only">Search</label>
                 <input
                     type="text"
@@ -105,32 +105,36 @@ const RemoveFromProject = () => {
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th scope="col" className="px-6 py-3">ID</th>
                             <th scope="col" className="px-6 py-3">Project ID</th>
                             <th scope="col" className="px-6 py-3">Project Name</th>
-                            <th scope="col" className="px-6 py-3">User ID</th>
+                            <th scope="col" className="px-6 py-3">Description</th>
+                            <th scope="col" className="px-6 py-3">Status</th>
+                            <th scope="col" className="px-6 py-3">Users</th>
                             <th scope="col" className="px-6 py-3">Action</th>
                         </tr>
                     </thead>
-                    {filteredProjects.map((data) => {
+                    {filteredProjects.map((project) => {
                         return (
-                            <tbody key={data.projectID}>
+                            <tbody key={project.projectID}>
                                 <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                    <td scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {data.id}
+                                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                            {project.projectID}
+                                    </th>
+                                    <td className="px-6 py-4">
+                                            {project.name}
                                     </td>
                                     <td className="px-6 py-4">
-                                            {data.projectID}
+                                            {project.description}
                                     </td>
                                     <td className="px-6 py-4">
-                                            {data.project.projectName}
+                                            {project.status}
                                     </td>
                                     <td className="px-6 py-4">
-                                            {data.user.userID}
+                                            {project.users}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <Link onClick={(event) => handleOnRemove(event,data.id)}
-                                            className="mr-3 font-medium text-blue-600 dark:text-blue-500 hover:underline">Remove</Link>
+                                        <Link onClick={(event) => handleOnAssign(event,project.projectID)}
+                                            className="mr-3 font-medium text-blue-600 dark:text-blue-500 hover:underline">Assign</Link>
                                     </td>
                                 </tr>
                             </tbody>
@@ -143,4 +147,4 @@ const RemoveFromProject = () => {
     );
 }
 
-export default RemoveFromProject;
+export default AssignProject;

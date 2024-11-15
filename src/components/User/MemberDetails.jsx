@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Footer from '../comman/Footer';
-import NavBar from '../comman/NavBar';
+import Footer from '../common/Footer';
+import NavBar from '../common/NavBar';
 
 const MemberDetails = () => {
     const [users, setUsers] = useState([]);

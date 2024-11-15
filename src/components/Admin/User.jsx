@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import NavBar from "./comman/NavBar";
-import Footer from "./comman/Footer";
+import NavBar from "../common/NavBar";
+import Footer from "../common/Footer";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
