@@ -115,8 +115,8 @@ const UpdateProject = (props) => {
           >
             <option value="">Select status</option>
             <option value="Yet To Start">Yet To Start</option>
-            <option value="Started (In Progress)">Started (In Progress)</option>
-            <option value="Done (Completed)">Done (Completed)</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
             <option value="On Hold">On Hold</option>
           </select>
 

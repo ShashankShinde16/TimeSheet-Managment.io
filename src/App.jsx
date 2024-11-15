@@ -14,6 +14,7 @@ import AssignProject from './components/Admin/AssignProject'
 import RemoveFromProject from './components/Admin/RemoveFromProject'
 import AddTask from './components/User/AddTask'
 import MemberDetails from './components/User/MemberDetails'
+import TaskMasterByDate from './components/User/TaskMasterByDate'
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Route path='projects-list' element={<UserMaster />} />
           <Route path='add-task' element={<AddTask />} />
           <Route path='task-list' element={<TaskMaster />} />
+          <Route path='tasks/:date' element={<TaskMasterByDate />} />
           <Route path='project-member-list' element={<MemberDetails />} />
           <Route path='project-detail'>
             <Route path=":id" element={<TaskMaster />} />

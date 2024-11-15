@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { selectToken } from '../../features/userSlice';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SearchFilter from '../common/SearchFilter';
 
 const AssignProject = () => {
     const [projects, setProjects] = useState([]);
@@ -15,15 +16,18 @@ const AssignProject = () => {
     const navigate = useNavigate();
     const token = useSelector(selectToken);
     const [projectNameFilter,setProjectNameFilter] = useState('');
-    const [projectIdFilter, setprojectIdFilter] = useState('');
+    const [projectIdFilter, setProjectIdFilter] = useState('');
+    const [filteredProjects, setFilteredProjects] = useState([]);
 
-    const filteredProjects = projects.filter((project) => {
-        const matchesProjectID = project.projectID.toString().includes(projectIdFilter);
-        const matchesProjectName = project.name.toLowerCase().includes(projectNameFilter.toLowerCase());
-        const isProjectInDTO = projectDTO.some(dto => dto.projectID === project.projectID);
-
-        return matchesProjectID && matchesProjectName && !isProjectInDTO;
-    });
+    const handleSearchFeature = () => {
+        const filteredProjects = projects.filter((project) => {
+            const matchesProjectID = project.projectID.toString().includes(projectIdFilter);
+            const matchesProjectName = project.name.toLowerCase().includes(projectNameFilter.toLowerCase());
+    
+            return matchesProjectID && matchesProjectName;
+        });
+        setFilteredProjects(filteredProjects);
+    }
 
     const handleOnAssign = async (event, projectID) => {
         event.preventDefault();
@@ -56,6 +60,7 @@ const AssignProject = () => {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/ProjectAPI`, {
                     cancelToken: source.token, // Pass the cancel token with the request
                 });
+                setFilteredProjects(response.data.result);
                 setProjects(response.data.result); // Update state with the fetched data
             } catch (error) {
                 if (axios.isCancel(error)) {
@@ -83,24 +88,12 @@ const AssignProject = () => {
     return (
         <>
             <NavBar />
-            <label htmlFor="projectId-search" className="sr-only">Search</label>
-                <input
-                    type="text"
-                    id="projectId-search"
-                    className="mx-auto my-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-11/12 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Search by project Id"
-                    value={projectIdFilter}
-                    onChange={(e) => setprojectIdFilter(e.target.value)} 
-                />
-            <label htmlFor="projectName-search" className="sr-only">Search</label>
-                <input
-                    type="text"
-                    id="projectName-search"
-                    className="mx-auto my-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-11/12 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Search by Project Name"
-                    value={projectNameFilter}
-                    onChange={(e) => setProjectNameFilter(e.target.value)} 
-                />
+            <SearchFilter
+                projectIdFilter={projectIdFilter}
+                projectNameFilter={projectNameFilter}
+                setProjectIdFilter={setProjectIdFilter}
+                setProjectNameFilter={setProjectNameFilter}
+                handleSearchFeature={handleSearchFeature}/>
             <div className="relative overflow-x-auto shadow-lg sm:rounded-lg">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

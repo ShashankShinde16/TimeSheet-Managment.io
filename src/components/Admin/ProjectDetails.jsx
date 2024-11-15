@@ -36,8 +36,8 @@ const ProjectDetails = (params) => {
         <>
             <NavBar />
             <ToastContainer />
-            <div className="w-full bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                <ul className="flex justify-around text-sm font-medium text-center text-gray-500 border-b border-gray-200 rounded-t-lg bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800" role="tablist">
+            <div className="w-full bg-gray-300 border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                <ul className="flex justify-around text-sm font-medium text-center text-gray-500 border-b border-gray-200 rounded-t-lg bg-gray-300 dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800" role="tablist">
                     <li className="me-2">
                         <button
                             id="project-tab"
@@ -46,7 +46,7 @@ const ProjectDetails = (params) => {
                             aria-controls="project"
                             aria-selected={activeTab === "project"}
                             onClick={() => handleTabClick("project")}
-                            className={`inline-block p-4 ${activeTab === "project" ? "text-blue-600 dark:text-blue-500" : "text-gray-500"} rounded-ss-lg hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700`}>
+                            className={`inline-block p-4 ${activeTab === "project" ? "text-gray-900 dark:text-gray-400" : "text-gray-500"} hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700`}>
                             Project Details
                         </button>
                     </li>
@@ -58,7 +58,7 @@ const ProjectDetails = (params) => {
                             aria-controls="User"
                             aria-selected={activeTab === "User"}
                             onClick={() => handleTabClick("User")}
-                            className={`inline-block p-4 ${activeTab === "User" ? "text-blue-600 dark:text-blue-500" : "text-gray-500"} hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300`}>
+                            className={`inline-block p-4 ${activeTab === "User" ? "text-gray-900 dark:text-gray-400" : "text-gray-500"} hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300`}>
                             User Details
                         </button>
                     </li>
@@ -70,7 +70,7 @@ const ProjectDetails = (params) => {
                             aria-controls="task"
                             aria-selected={activeTab === "task"}
                             onClick={() => handleTabClick("task")}
-                            className={`inline-block p-4 ${activeTab === "task" ? "text-blue-600 dark:text-blue-500" : "text-gray-500"} hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300`}>
+                            className={`inline-block p-4 ${activeTab === "task" ? "text-gray-900 dark:text-gray-400" : "text-gray-500"} hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300`}>
                             Task Details
                         </button>
                     </li>

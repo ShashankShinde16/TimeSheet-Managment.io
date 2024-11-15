@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Logo from "../../assets/icon.svg"
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, selectRole, SET_JwtToken } from "../../features/userSlice";
+import { logout, selectName, selectRole, SET_JwtToken } from "../../features/userSlice";
 import 'react-toastify/dist/ReactToastify.css';
 
 const NavBar = () => {
@@ -13,6 +12,7 @@ const NavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const role = useSelector(selectRole);
+  const name = useSelector(selectName);
 
   // Toggle the main menu (mobile)
   const toggleMenu = () => {
@@ -51,6 +51,7 @@ const NavBar = () => {
           <span className="self-center text-xl font-semibold whitespace-nowrap text-white">
             TimeSheet
           </span>
+          <h1 className="text-gray-100 uppercase hover:underline">Welcome,{" " + name}</h1>
         </Link>
 
         {/* Mobile Menu Button */}
@@ -89,7 +90,7 @@ const NavBar = () => {
               <li className="flex items-center">
                 <Link
                   to={`/admin/user-list`}
-                  className="block py-2 px-3 text-white rounded hover:bg-gray-100 hover:text-gray-400 md:hover:bg-transparent md:border-0 md:hover:bg-gray-100 md:hover:text-gray-400 md:p-2 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
+                  className="block py-2 px-3 text-white rounded hover:bg-gray-100 hover:text-gray-400 md:border-0 md:hover:bg-gray-100 md:hover:text-gray-400 md:p-2 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
                   aria-current="page"
                 >
                   Users
@@ -101,7 +102,7 @@ const NavBar = () => {
             <li className="flex items-center">
               <Link
                 onClick={handleSignOut}
-                className="block py-2 px-3 text-white rounded hover:bg-gray-100 hover:text-gray-400 md:hover:bg-transparent md:border-0 md:hover:bg-gray-100 md:hover:text-gray-400 md:p-2 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
+                className="block py-2 px-3 text-white rounded hover:bg-gray-100 hover:text-gray-400 md:border-0 md:hover:bg-gray-100 md:hover:text-gray-400 md:p-2 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
                 aria-current="page"
               >
                 Signout

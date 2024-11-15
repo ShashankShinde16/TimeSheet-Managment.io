@@ -6,30 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const UserDetails = (props) => {
     const [users, setUsers] = useState([]);
-    const [search, setSearch] = useState('');
-    const [noProjects, setNoProjects] = useState([]);
-    const [filter, setFilter] = useState([]);
     const searchInputRef = useRef(null);
-
-    // Handle search input change
-    const handleSearchChange = async (e) => {
-        e.preventDefault();
-        const value = e.target.value;
-        setSearch(value);
-        searches(value);
-    };
-
-    // Function to filter users based on search query
-    const searches = (value) => {
-        if (value.length > 0) {
-            const user = noProjects.filter((suggest) => {
-                return suggest.name.toLowerCase().includes(value.toLowerCase());
-            });
-            setFilter(user);
-        } else {
-            setFilter(noProjects);
-        }
-    };
 
     // Fetch data when the component mounts
     useEffect(() => {
@@ -40,11 +17,7 @@ const UserDetails = (props) => {
                 const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/ProjectAssignedUserAPI/PAUByProjectId?id=${props.projectID}`, {
                     cancelToken: source.token, 
                 });
-                const usersWithNoProjects = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/UserAPI/GetUserNoProjectAssigned`, {
-                    cancelToken: source.token, 
-                });
-                setUsers(response.data.result);  
-                setNoProjects(usersWithNoProjects.data.result);  
+                setUsers(response.data.result);   
             } catch (error) {
                 console.log(error.message);
             }
@@ -108,7 +81,7 @@ const UserDetails = (props) => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/TaskAPI/GetWorkingHoursByUser/${props.projectID}/${data.user.userID}`);
 
-                toast.success(`Duration : ${response.data.result} hours`, {
+                toast.success(`Duration : ${(response.data.result).toFixed(2)} hours`, {
                     autoClose: 2000,
                     hideProgressBar: false,
                 });

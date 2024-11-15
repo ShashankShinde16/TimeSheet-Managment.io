@@ -44,7 +44,7 @@ const AddTask = () => {
             );    
             console.log(response.data);
             if(response.data.statusCode == 201){
-                toast.success(`User added successfully`, {
+                toast.success(`Task added successfully`, {
                     autoClose: 1500,
                     hideProgressBar: false,
                   });
